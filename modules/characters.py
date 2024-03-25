@@ -20,7 +20,7 @@ class Player(pg.sprite.Sprite):
         self.not_hit_portal = True
         self.on_moving_plat = False
         self.gun_active = False
-
+        self.ducking = True
         self.current_frame = 0
         self.last_update = 0
         self.keys = 0
@@ -39,6 +39,7 @@ class Player(pg.sprite.Sprite):
         self.acc = vec(0,0)
     def load_images(self):
         self.gun_index = 0
+        self.hurt_frame = self.game.spritesheet_char.get_image(438, 0, 69, 92)
         self.gun_frames = [
             pg.transform.scale(pg.image.load("./images/raygun.png").convert_alpha(), (100,100)),
             pg.transform.flip(pg.transform.scale(pg.image.load("./images/raygun.png").convert_alpha(), (100,100)), True, False)
@@ -72,12 +73,6 @@ class Player(pg.sprite.Sprite):
         self.animate()
         self.move()
         self.update_gun_animation()
-        """
-        #if self.vel.y > 0:
-         #  self.ground_plat_collission()
-          # self.jump_plat_colission()
-        """
-        
     def move(self):
         self.acc = vec(0,MAIN_GRAVITY)
         self.vel.x = 0
@@ -100,8 +95,13 @@ class Player(pg.sprite.Sprite):
             self.jumping = True
             #self.game.jump_sound.play()
     def duck(self):
+        self.ducking = True
         self.pos.y += 20
         self.image = self.duck_frame[0]
+        self.image.set_colorkey("black")
+    def hurt(self, damage:int):
+        self.health -= damage
+        self.image = self.hurt_frame
         self.image.set_colorkey("black")
     def animate(self):
         now = pg.time.get_ticks()
@@ -175,7 +175,6 @@ class Player(pg.sprite.Sprite):
     def draw_healthbar(self):
         pg.draw.rect(self.game.screen, (255, 0,0), (self.rect.x, self.rect.y - 20, self.rect.width, 10 ))
         pg.draw.rect(self.game.screen, (00, 255,0), (self.rect.x, self.rect.y - 20, self.rect.width * (1-((self.max_health - self.health))/self.max_health), 10 ))
-
 class EnemyFly(pg.sprite.Sprite):
     def __init__(self, game:object, x:int,y:int):
         self._layer = ENEMIES_LAYER
