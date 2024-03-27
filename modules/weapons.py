@@ -10,11 +10,6 @@ class Bullet(pg.sprite.Sprite):
         self.image = self.game.spritesheet_items.get_image(0, 553,19,20)
         self.image.set_colorkey("black")
         self.rect = self.image.get_rect()
-     def move(self):
-        pass
-
-     def collided(self, other_rect):
-        return self.rect.colliderect(other_rect)
 
 class PlayerBullet(Bullet):
     def __init__(self, game, x, y, speed, targetx,targety):
@@ -69,7 +64,7 @@ class CourseBullet(Bullet):
         hits_background = pg.sprite.spritecollide(self, self.game.background_sprites, False)
         for hit in hits_background:
             if hit.type == "umbrella_shield":
-                if self.rect.y + self.rect.h > hit.rect.y:
+                if self.rect.y + self.rect.height > hit.rect.y:
                     print("hit now")
                     self.kill()
         if hit:

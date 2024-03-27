@@ -1,7 +1,7 @@
 import pygame as pg
 from settings import *
 from utils import *
-from modules.items import Spike
+from modules.items import PlatItem
 import random as rd
 
 class Platform(pg.sprite.Sprite):
@@ -76,6 +76,8 @@ class JumpPlatform(Platform):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.image = self.game.spritesheet_platform.get_image(720,432,70,70)
         self.image.set_colorkey("black")
+        if rd.randrange(1,3) == 1:
+            PlatItem(self.game, self)
 
 
 class MovingJumpPlatform(JumpPlatform):
@@ -84,6 +86,7 @@ class MovingJumpPlatform(JumpPlatform):
         self.time = time
         self.toggle_time_interval = 500
         self.direction = start_dir
+        
     def update(self):
         now = pg.time.get_ticks()
         time_since_last_toggle = now - self.time

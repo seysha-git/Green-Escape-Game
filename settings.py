@@ -27,7 +27,7 @@ TS_FILE = "topscores.txt"
 PLAYER_LAYER = 2
 PLATFORM_LAYER = 1
 ENEMIES_LAYER = 2
-
+POW_LAYER = 1
 #Player properaties
 MAIN_CHAR_COLOR = "white"
 MAIN_ACC = 5

@@ -21,14 +21,16 @@ class Player(pg.sprite.Sprite):
         self.on_moving_plat = False
         self.gun_active = False
         self.ducking = True
+        self.reload_state = False
         self.current_frame = 0
         self.last_update = 0
         self.keys = 0
         self.health = 100
         self.max_health = 100
         self.shots = 0
+        self.last_shot_time = 0
+        self.reload_start_time = 0 
         self.hits = 0
-
         self.load_images()
         self.image = self.standing_frames[0]
         
@@ -73,6 +75,7 @@ class Player(pg.sprite.Sprite):
         self.animate()
         self.move()
         self.update_gun_animation()
+        self.reload_gun()
     def move(self):
         self.acc = vec(0,MAIN_GRAVITY)
         self.vel.x = 0
@@ -103,6 +106,12 @@ class Player(pg.sprite.Sprite):
         self.health -= damage
         self.image = self.hurt_frame
         self.image.set_colorkey("black")
+    def gain_lives(self, health_boost:int):
+        if self.health + health_boost >= self.max_health:
+            self.health = self.max_health
+        else:
+            self.health += health_boost
+
     def animate(self):
         now = pg.time.get_ticks()
         if self.jumping:
@@ -150,13 +159,24 @@ class Player(pg.sprite.Sprite):
          return round((self.hits/self.shots), 2)*100                   
     def draw(self):
          self.draw_healthbar() 
-         self.draw_gun()
+         if self.gun_active:
+            self.draw_gun()
+    def reload_gun(self):
+        now = pg.time.get_ticks()
+        if self.shots >= 3: 
+            self.reload_state = True
+            if now - self.last_shot_time > 3000:  # Check if 3 seconds have elapsed since the last shot
+                # Reload the gun here
+                self.reload_state = False
+                self.shots = 0 
+                self.last_shot_time = now  # Update the last shot time to the current time
     def shoot(self, x:int,y:int):
-        self.shots += 1
-        if self.gun_index == 0:
-            PlayerBullet(self.game, self.rect.right, self.rect.centery, 6, x,y)
-        if self.gun_index == 1:
-             PlayerBullet(self.game, self.rect.left, self.rect.centery, 6, x,y)      
+        if self.gun_active and not self.reload_state:
+            self.shots += 1
+            if self.gun_index == 0:
+                PlayerBullet(self.game, self.rect.right, self.rect.centery, 6, x,y)
+            if self.gun_index == 1:
+                PlayerBullet(self.game, self.rect.left, self.rect.centery, 6, x,y)      
     def draw_gun(self):
         x,y = pg.mouse.get_pos()
         angle = math.degrees(math.atan2(y - self.rect.centery, x - self.rect.centerx))

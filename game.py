@@ -41,7 +41,7 @@ class Game:
         self.keys = pg.sprite.Group()
         self.spikes = pg.sprite.Group()
         self.doors = pg.sprite.Group()
-        self.princesses = pg.sprite.Group()
+        self.boosters = pg.sprite.Group()
         
         self.grounds = pg.sprite.Group()
         self.check_points = pg.sprite.Group()
@@ -150,48 +150,82 @@ class Game:
         self.s = Button(self.screen, "s", 120, 70, (520,600))
         self.d = Button(self.screen, "d", 120, 70, (820,600))
 
-        self.play_button = Button(self.screen, "Spill nå", 200, 60, (590,800), "green")
+        self.play_button = Button(self.screen, "Spill nå", 200, 60, (500,800), "green")
         self.play_button.draw()
+        self.quit_button = Button(self.screen, "Avslutt", 200, 60, (720, 800))
+        self.quit_button.draw()
         self.w.draw()
         self.a.draw()
         self.s.draw()
         self.d.draw()
         pg.display.flip()
         self.wait_for_key()
-    def show_over_screen(self): 
-        if self.playing:
-           return
-        self.play_button = Button(self.screen, "Spill igjen", 200, 50, (520,800))
-        self.quit_button = Button(self.screen, "Avslutt", 200, 50, (780,800))
-
+    def show_over_screen(self):
         self.screen.fill("dark grey")
         pg.draw.rect(self.screen, "light blue", (460, 290, 620, 400), 0, 5)
+
+        self.play_button = Button(self.screen, "Spill igjen", 200, 50, (520, 800))
+        self.quit_button = Button(self.screen, "Avslutt", 200, 50, (780, 800))
         self.play_button.draw()
         self.quit_button.draw()
         if self.completed:
             self.title = "Bra Jobba!"
-            hit_ratio = self.game_ground.player.get_hit_ratio()
-            health = self.game_ground.player.health
-            if self.delayed_time < self.game_data["best_time"].iloc[0] or self.game_data["best_time"].iloc[0] == 0:
-                self.update_game_data("best_time", [self.delayed_time])
-            if health > self.game_data["best_health"].iloc[0]:
-               self.update_game_data("best_health", [health])
-            if hit_ratio > self.game_data["best_aim"].iloc[0]:
-                self.update_game_data("best_aim", hit_ratio)
-            self.draw_text("Statistikk", 50, "white", 460+220, 320)
-            self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]}          Din tid: {self.delayed_time}", 30, "white", 460 + 100, 400)
-            self.draw_text(f"Best aim:  {self.game_data['best_aim'].iloc[0]}%          Ditt aim : {hit_ratio}%", 30, "white", 460 + 100, 460)
-            self.draw_text(f"Mest liv: {self.game_data['best_health'].iloc[0]}/100          Ditt liv: {health}/100", 30, "white", 460 + 100, 520)
-            self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
+            self.handle_completed_game()
             self.reset_timer()
-        if self.player_dead:    
+        elif self.player_dead:
             self.title = "Du døde"
             self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
-        self.draw_text(f"{self.title}", 120, "white",570,80)
+            self.reset_timer()
+
+        self.draw_text(f"{self.title}", 120, "white", 570, 80)
+
+        if self.completed:
+            self.display_game_statistics()
+
+
         pg.draw.rect(self.screen, "black", (0, 220, WIN_WIDTH, 20))
-        pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT-180, WIN_WIDTH, 20))
+        pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT - 180, WIN_WIDTH, 20))
+
         pg.display.flip()
         self.wait_for_key()
+
+    def handle_completed_game(self):
+        hit_ratio = self.game_ground.player.get_hit_ratio()
+        health = self.game_ground.player.health
+
+        self.update_best_records(hit_ratio, health)
+
+        self.draw_text("Statistikk", 50, "white", 460 + 220, 320)
+        self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]}          Din tid: {self.delayed_time}", 30,
+                    "white", 460 + 100, 400)
+        self.draw_text(f"Best aim:  {self.game_data['best_aim'].iloc[0]}%          Ditt aim : {hit_ratio}%", 30,
+                    "white", 460 + 100, 460)
+        self.draw_text(f"Mest liv: {self.game_data['best_health'].iloc[0]}/100          Ditt liv: {health}/100", 30,
+                    "white", 460 + 100, 520)
+        self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
+
+    def update_best_records(self, hit_ratio, health):
+        if self.delayed_time < self.game_data["best_time"].iloc[0] or self.game_data["best_time"].iloc[0] == 0:
+            self.update_game_data("best_time", [self.delayed_time])
+        if health > self.game_data["best_health"].iloc[0]:
+            self.update_game_data("best_health", [health])
+        if hit_ratio > self.game_data["best_aim"].iloc[0]:
+            self.update_game_data("best_aim", hit_ratio)
+
+    def display_game_statistics(self):
+        hit_ratio = self.game_ground.player.get_hit_ratio()
+        health = self.game_ground.player.health
+
+        # Display statistics
+        self.draw_text("Statistikk", 50, "white", 460 + 220, 320)
+        self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]}          Din tid: {self.delayed_time}", 30,
+                    "white", 460 + 100, 400)
+        self.draw_text(f"Best aim:  {self.game_data['best_aim'].iloc[0]}%          Ditt aim : {hit_ratio}%", 30,
+                    "white", 460 + 100, 460)
+        self.draw_text(f"Mest liv: {self.game_data['best_health'].iloc[0]}/100          Ditt liv: {health}/100", 30,
+                    "white", 460 + 100, 520)
+        self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
+
     def wait_for_key(self):
         waiting = True
         while waiting:
@@ -200,9 +234,7 @@ class Game:
             self.quit_button.check_click()
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    waiting = False 
-                    self.running = False 
-                    sys.exit()
+                    sys.exit() 
             if self.play_button.pressed:
                 waiting = False
                 self.completed = False
