@@ -21,6 +21,7 @@ class Game:
         self.running = True
         self.completed = False
         self.player_dead = False
+        self.reset_screen = False
         self.load_game_data()
         self.game_ground = GameGround(self)
         self.time_played = 0
@@ -129,6 +130,7 @@ class Game:
     def update_time(self):
         self.now = pg.time.get_ticks()
         self.delayed_time = (self.now - self.last_game_ended)//1000
+        print(self.delayed_time)
     def reset_timer(self):
         self.last_game_ended = self.now
     def draw(self):
@@ -143,7 +145,7 @@ class Game:
         pg.draw.rect(self.screen, "black", (0, 220, WIN_WIDTH, 20))
         pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT-180, WIN_WIDTH, 20))
         self.draw_text("Mitt Platform spill", 100, "white",450,100)
-        self.draw_text(f"Beste tid: {45}", 60, "white", 600, 280 )
+        self.draw_text(f'Beste tid: {self.game_data["best_time"].iloc[0]} sek', 60, "white", 600, 280 )
         self.draw_text("Kontrollene", 50, "white", 640, 400)
         self.w = Button(self.screen, "w", 120, 70, (660,500))
         self.a = Button(self.screen, "a", 120, 70, (660,600))
@@ -162,32 +164,31 @@ class Game:
         self.wait_for_key()
     def show_over_screen(self):
         self.screen.fill("dark grey")
-        pg.draw.rect(self.screen, "light blue", (460, 290, 620, 400), 0, 5)
 
         self.play_button = Button(self.screen, "Spill igjen", 200, 50, (520, 800))
         self.quit_button = Button(self.screen, "Avslutt", 200, 50, (780, 800))
         self.play_button.draw()
         self.quit_button.draw()
-        if self.completed:
-            self.title = "Bra Jobba!"
-            self.handle_completed_game()
-            self.reset_timer()
-        elif self.player_dead:
-            self.title = "Du døde"
-            self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
-            self.reset_timer()
+        if self.running:
+            self.reset_screen = True
+            if self.completed:
+                self.title = "Bra Jobba!"
+                pg.draw.rect(self.screen, "light blue", (460, 290, 620, 400), 0, 5)
+                self.handle_completed_game()
+                self.reset_timer()
+            elif self.player_dead:
+                self.title = "Du døde"
+                self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
+                self.reset_timer()
+            self.draw_text(f"{self.title}", 120, "white", 570, 80)
 
-        self.draw_text(f"{self.title}", 120, "white", 570, 80)
+            if self.completed:
+                self.display_game_statistics()
+            pg.draw.rect(self.screen, "black", (0, 220, WIN_WIDTH, 20))
+            pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT - 180, WIN_WIDTH, 20))
 
-        if self.completed:
-            self.display_game_statistics()
-
-
-        pg.draw.rect(self.screen, "black", (0, 220, WIN_WIDTH, 20))
-        pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT - 180, WIN_WIDTH, 20))
-
-        pg.display.flip()
-        self.wait_for_key()
+            pg.display.flip()
+            self.wait_for_key()
 
     def handle_completed_game(self):
         hit_ratio = self.game_ground.player.get_hit_ratio()

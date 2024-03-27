@@ -30,7 +30,6 @@ class GroundPlatform(Platform):
         }
         self.image = self.images[type]
         self.image.set_colorkey("black")
-        #self.mask = pg.mask.from_surface(self.image)
 
 class BackgroundBlocks(Platform):
     def __init__(self, game,x,y, type=""):

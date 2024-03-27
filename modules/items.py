@@ -3,17 +3,17 @@ from settings import *
 import random as rd
 from utils import *
 
-class BaseSprite(pg.sprite.Sprite):
+class ItemSprite(pg.sprite.Sprite):
     def __init__(self, game, groups):
+        self._layer = POW_LAYER
         self.groups = groups
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
 
-class PlatItem(BaseSprite):
+class PlatItem(ItemSprite):
     def __init__(self, game, plat):
         groups = game.all_sprites, game.boosters
         super().__init__(game, groups)
-        self._layer = POW_LAYER
         self.plat = plat
         self.image = self.game.spritesheet_items.get_image(72, 219, 70, 70)
         self.image.set_colorkey("black")
@@ -24,7 +24,7 @@ class PlatItem(BaseSprite):
     def update(self):
         self.rect.centerx = self.plat.rect.centerx
 
-class Checkpoint(BaseSprite):
+class Checkpoint(ItemSprite):
     def __init__(self, game, x, y, type):
         groups = game.all_sprites, game.check_points
         super().__init__(game, groups)
@@ -35,7 +35,7 @@ class Checkpoint(BaseSprite):
         self.rect.y = y
         self.type = type
 
-class Key(BaseSprite):
+class Key(ItemSprite):
     def __init__(self, game, x, y):
         groups = game.all_sprites, game.keys
         super().__init__(game, groups)
@@ -45,18 +45,18 @@ class Key(BaseSprite):
         self.rect.x = x
         self.rect.y = y
 
-class Spike(BaseSprite):
+class Spike(ItemSprite):
     def __init__(self, game, x, y, type, time):
         groups = game.all_sprites, game.spikes
         super().__init__(game, groups)
         if type == 0:
             self.images = [
-                self.game.spritesheet_items.get_image(347, 0, 70, 70),
+                self.game.spritesheet_items.get_image(347, 0, 45, 70),
                 self.game.spritesheet_items.get_image(0, 0, 0, 0)
             ]
         elif type == 1:
             self.images = [
-                pg.transform.rotate(self.game.spritesheet_items.get_image(347, 0, 70, 70), 180),
+                pg.transform.rotate(self.game.spritesheet_items.get_image(347, 0, 45, 70), 180),
                 self.game.spritesheet_items.get_image(0, 0, 0, 0),
             ]
         self.index = 0
@@ -73,10 +73,9 @@ class Spike(BaseSprite):
         now = pg.time.get_ticks()
         time_since_last_toggle = now - self.last_toggle_time
 
-        # If 2 seconds have passed since the last toggle
         if time_since_last_toggle >= self.toggle_time:
-            self.toggle_spike()  # Toggle the spike
-            self.last_toggle_time = now  # Update the last toggle time
+            self.toggle_spike()  
+            self.last_toggle_time = now  
 
     def toggle_spike(self):
         self.index = 1 - self.index
@@ -86,7 +85,7 @@ class Spike(BaseSprite):
 
 
 
-
+"""
 class PlatItem(pg.sprite.Sprite):
     def __init__(self, game, plat):
         self._layer = POW_LAYER
@@ -162,4 +161,8 @@ class Spike(pg.sprite.Sprite):
         self.index = 1 - self.index
         self.image = self.images[self.index]
         self.image.set_colorkey("black")
+
+
+
+"""
 

@@ -21,7 +21,7 @@ class GameGround:
         self.start_runner_room()
         self.jump_gun_room()
         self.shoot_room()
-        self.player = Player(self.game, WIN_WIDTH-250,200)
+        self.player = Player(self.game, 100,WIN_HEIGHT-100)
     def update(self):
         self.player_wall_collision_x()
         self.player_wall_collision_y()
@@ -77,7 +77,10 @@ class GameGround:
         hits = pg.sprite.spritecollide(self.player, self.game.spikes, False)
         if hits:
             if hits[0].index == 0:
-                self.player.pos.x = hits[0].rect.x - 40
+                if self.player.pos.x < hits[0].rect.x + hits[0].rect.w:
+                    self.player.pos.x = hits[0].rect.x - 40
+                else:
+                    self.player.pos.x = hits[0].rect.x + hits[0].rect.w + 40
                 self.player.hurt(5)
     def player_door_colission(self):
         hits = pg.sprite.spritecollide(self.player, self.game.background_sprites, False)
@@ -199,9 +202,9 @@ class GameGround:
         for i in range(1,3):
             for j in range(1,8):
                 WallPlatform(self.game, 500 + 69*j,WIN_HEIGHT-230+70*i, type="block")
-        Spike(self.game, 630, WIN_HEIGHT-260, 0,self.start_toggle_time)
-        Spike(self.game, 800, WIN_HEIGHT-290, 1, self.start_toggle_time)
-        Spike(self.game, 980, WIN_HEIGHT-260, 0, self.start_toggle_time)
+        Spike(self.game, 650, WIN_HEIGHT-260, 0,self.start_toggle_time)
+        Spike(self.game, 780, WIN_HEIGHT-290, 1, self.start_toggle_time)
+        Spike(self.game, 990, WIN_HEIGHT-260, 0, self.start_toggle_time)
     def shoot_room(self):
         for i in range(1,16):
             GroundPlatform(self.game, 70*i, 515, "lava")

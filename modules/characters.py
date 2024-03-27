@@ -20,7 +20,6 @@ class Player(pg.sprite.Sprite):
         self.not_hit_portal = True
         self.on_moving_plat = False
         self.gun_active = False
-        self.ducking = True
         self.reload_state = False
         self.current_frame = 0
         self.last_update = 0
@@ -98,7 +97,6 @@ class Player(pg.sprite.Sprite):
             self.jumping = True
             #self.game.jump_sound.play()
     def duck(self):
-        self.ducking = True
         self.pos.y += 20
         self.image = self.duck_frame[0]
         self.image.set_colorkey("black")
