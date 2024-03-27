@@ -130,7 +130,6 @@ class Game:
     def update_time(self):
         self.now = pg.time.get_ticks()
         self.delayed_time = (self.now - self.last_game_ended)//1000
-        print(self.delayed_time)
     def reset_timer(self):
         self.last_game_ended = self.now
     def draw(self):

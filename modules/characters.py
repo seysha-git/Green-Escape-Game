@@ -27,8 +27,11 @@ class Player(pg.sprite.Sprite):
         self.health = 100
         self.max_health = 100
         self.shots = 0
+        self.ammo = 3
+        self.max_ammo = 3
         self.last_shot_time = 0
         self.reload_start_time = 0 
+        self.reload_time = 3000
         self.hits = 0
         self.load_images()
         self.image = self.standing_frames[0]
@@ -161,20 +164,22 @@ class Player(pg.sprite.Sprite):
             self.draw_gun()
     def reload_gun(self):
         now = pg.time.get_ticks()
-        if self.shots >= 3: 
+        if not self.reload_state and self.ammo < self.max_ammo:
             self.reload_state = True
-            if now - self.last_shot_time > 3000:  # Check if 3 seconds have elapsed since the last shot
-                # Reload the gun here
+            self.last_shot_time = pg.time.get_ticks()
+        if self.reload_state:
+            now = pg.time.get_ticks()
+            if now - self.last_shot_time >= self.reload_time:
+                self.ammo = self.max_ammo
                 self.reload_state = False
-                self.shots = 0 
-                self.last_shot_time = now  # Update the last shot time to the current time
     def shoot(self, x:int,y:int):
-        if self.gun_active and not self.reload_state:
+        if self.gun_active and self.ammo > 0:
             self.shots += 1
             if self.gun_index == 0:
                 PlayerBullet(self.game, self.rect.right, self.rect.centery, 6, x,y)
             if self.gun_index == 1:
-                PlayerBullet(self.game, self.rect.left, self.rect.centery, 6, x,y)      
+                PlayerBullet(self.game, self.rect.left, self.rect.centery, 6, x,y)  
+            self.ammo -= 1    
     def draw_gun(self):
         x,y = pg.mouse.get_pos()
         angle = math.degrees(math.atan2(y - self.rect.centery, x - self.rect.centerx))
@@ -193,6 +198,9 @@ class Player(pg.sprite.Sprite):
     def draw_healthbar(self):
         pg.draw.rect(self.game.screen, (255, 0,0), (self.rect.x, self.rect.y - 20, self.rect.width, 10 ))
         pg.draw.rect(self.game.screen, (00, 255,0), (self.rect.x, self.rect.y - 20, self.rect.width * (1-((self.max_health - self.health))/self.max_health), 10 ))
+    
+
+
 class EnemyFly(pg.sprite.Sprite):
     def __init__(self, game:object, x:int,y:int):
         self._layer = ENEMIES_LAYER
