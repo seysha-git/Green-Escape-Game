@@ -98,7 +98,8 @@ class Player(pg.sprite.Sprite):
         if hits and not self.jumping and self.on_stairs == False:
             self.vel.y = -MAIN_JUMP_VEL
             self.jumping = True
-            #self.game.jump_sound.play()
+            self.game.jump_sound.play()
+            self.game.jump_sound.set_volume(0.2)
     def duck(self):
         self.pos.y += 20
         self.image = self.duck_frame[0]
@@ -175,6 +176,7 @@ class Player(pg.sprite.Sprite):
     def shoot(self, x:int,y:int):
         if self.gun_active and self.ammo > 0:
             self.shots += 1
+            self.game.shoot_sound.play()
             if self.gun_index == 0:
                 PlayerBullet(self.game, self.rect.right, self.rect.centery, 6, x,y)
             if self.gun_index == 1:
@@ -240,6 +242,7 @@ class EnemyFly(pg.sprite.Sprite):
     def bullet_colission(self):
         hit = pg.sprite.spritecollide(self, self.game.player_bullets, True)
         if hit:
+            self.game.enemies_hit_sound.play()
             self.game.game_ground.player.hits += 1
             self.kill()
             if rd.randrange(2) == 1:

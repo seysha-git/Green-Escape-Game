@@ -21,7 +21,6 @@ class Game:
         self.running = True
         self.completed = False
         self.player_dead = False
-        self.reset_screen = False
         self.load_game_data()
         self.game_ground = GameGround(self)
         self.time_played = 0
@@ -49,7 +48,7 @@ class Game:
         self.enemies = pg.sprite.Group()
 
         self.game_ground.new()
-        pg.mixer.music.load(path.join(self.snd_dir, "part1.ogg"))
+        pg.mixer.music.load(path.join(self.snd_dir, "part3.ogg"))
         self.run()
     def load_game_data(self):
         self.dir = path.dirname(__file__)
@@ -70,21 +69,35 @@ class Game:
         self.spritesheet_enemies = Spritesheet(path.join(img_dir, SPRITESHEET_ENEMIES))
         self.spritesheet_huds = Spritesheet(path.join(img_dir, SPRITESHEET_HUD))
         self.spritesheet_princess = Spritesheet(path.join(img_dir, SPRITESHEET_PRINCESS))
+        
+        self.get_sounds_data()
+        self.level_guide()
+    def get_sounds_data(self):
         self.snd_dir = path.join(self.dir, "sounds")
         self.jump_sound = pg.mixer.Sound(path.join(self.snd_dir, "Jump33.wav"))
         self.gems_sound = pg.mixer.Sound(path.join(self.snd_dir, "boost.wav"))
-        self.level_guide()
+        self.lost_game = pg.mixer.Sound(path.join(self.snd_dir, "Jingle_Lose_00.mp3"))
+        self.won_game = pg.mixer.Sound(path.join(self.snd_dir, "Jingle_Win_00.mp3"))
+        self.spikes_sound = pg.mixer.Sound(path.join(self.snd_dir, "Trap_00.mp3"))
+        self.you_lose_sound = pg.mixer.Sound(path.join(self.snd_dir, "you_lose.ogg"))
+        self.you_win_sound = pg.mixer.Sound(path.join(self.snd_dir, "you_win.ogg"))
+        self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, "rlaunch.wav"))
+        self.enemies_hit_sound = pg.mixer.Sound(path.join(self.snd_dir, "zombie-6.wav"))
+        self.check_points_sound = pg.mixer.Sound(path.join(self.snd_dir, "power_up.ogg"))
+        self.sound_1 = pg.mixer.Sound(path.join(self.snd_dir, "1.ogg"))
+        self.sound_2 = pg.mixer.Sound(path.join(self.snd_dir, "2.ogg"))
+        self.sound_3 = pg.mixer.Sound(path.join(self.snd_dir, "3.ogg"))
     def update_game_data(self, column_name, new_value):
         self.game_data[column_name] = new_value
         self.game_data.to_csv("game_data.csv", index=True)
     def level_guide(self):
         self.scrolling_text_font = pg.font.Font("freesansbold.ttf", 20)
         self.levels_messages = [ 
-            "This is my intro message",
-            "This is CP nr 2",
+            "Følg stjernene og kom deg til døren",
+            "Unngå bombene. Dukk under paraply for beskyttelse",
             "This is CP nr 3"
         ]
-        self.guide_rect = pg.Rect(WIN_WIDTH//2-200, 80,400,170)
+        self.guide_rect = pg.Rect(WIN_WIDTH//2-200, 80,600,100)
         self.active_message = 0
         self.message = self.levels_messages[self.active_message]
         self.snip_guide = self.scrolling_text_font.render(self.message, True, 'white')
@@ -113,7 +126,8 @@ class Game:
         else:
             return
     def run(self):
-        #pg.mixer.music.play(loops=-1)
+        pg.mixer.music.play(loops=-1)
+        pg.mixer.music.set_volume(0.5)
         self.playing = True
         while self.playing:
             self.animated_message()
@@ -140,6 +154,8 @@ class Game:
         self.draw_guide_message()
         pg.display.update()
     def show_start_screen(self):
+        pg.mixer.music.load(path.join(self.snd_dir, "part1.ogg"))
+        pg.mixer.music.play(loops=-1)
         self.screen.fill("light green")
         pg.draw.rect(self.screen, "black", (0, 220, WIN_WIDTH, 20))
         pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT-180, WIN_WIDTH, 20))
@@ -161,7 +177,9 @@ class Game:
         self.d.draw()
         pg.display.flip()
         self.wait_for_key()
+        pg.mixer.music.fadeout(500)
     def show_over_screen(self):
+        
         self.screen.fill("dark grey")
 
         self.play_button = Button(self.screen, "Spill igjen", 200, 50, (520, 800))
@@ -169,16 +187,20 @@ class Game:
         self.play_button.draw()
         self.quit_button.draw()
         if self.running:
-            self.reset_screen = True
             if self.completed:
+                self.won_game.play()
+                self.you_win_sound.play()
                 self.title = "Bra Jobba!"
                 pg.draw.rect(self.screen, "light blue", (460, 290, 620, 400), 0, 5)
                 self.handle_completed_game()
                 self.reset_timer()
             elif self.player_dead:
+                self.lost_game.play()
                 self.title = "Du døde"
-                self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
+                pg.draw.rect(self.screen, "black", (460, 290, 620, 400), 0, 5)
+                self.draw_text(f"Godt forsøk, prøv igjen :)", 50, "white", 460, 500)
                 self.reset_timer()
+                self.you_lose_sound.play()
             self.draw_text(f"{self.title}", 120, "white", 570, 80)
 
             if self.completed:
@@ -188,7 +210,6 @@ class Game:
 
             pg.display.flip()
             self.wait_for_key()
-
     def handle_completed_game(self):
         hit_ratio = self.game_ground.player.get_hit_ratio()
         health = self.game_ground.player.health
@@ -202,7 +223,7 @@ class Game:
                     "white", 460 + 100, 460)
         self.draw_text(f"Mest liv: {self.game_data['best_health'].iloc[0]}/100          Ditt liv: {health}/100", 30,
                     "white", 460 + 100, 520)
-        self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
+        #self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
 
     def update_best_records(self, hit_ratio, health):
         if self.delayed_time < self.game_data["best_time"].iloc[0] or self.game_data["best_time"].iloc[0] == 0:

@@ -14,6 +14,7 @@ class GameGround:
         self.ground_length = 23
         self.spawn_course_bullets = False
         self.game_door_arrived = True
+        self.spawn_spikes = True
         self.bomb_damage = 10
         self.enemies_damage = 20
     def new(self):
@@ -21,7 +22,7 @@ class GameGround:
         self.start_runner_room()
         self.jump_gun_room()
         self.shoot_room()
-        self.player = Player(self.game, WIN_WIDTH-200,100)
+        self.player = Player(self.game, 200,WIN_HEIGHT-100)
     def update(self):
         self.player_wall_collision_x()
         self.player_wall_collision_y()
@@ -36,6 +37,7 @@ class GameGround:
         self.move_wall_down()
         self.check_player_alive()
         self.player_mushroom_colission()
+        self.player_coursebullet_colission()
         
         self.update_create_bullets()
         self.player_key_pickup()
@@ -60,6 +62,16 @@ class GameGround:
     def player_key_pickup(self):
         hits = pg.sprite.spritecollide(self.player, self.game.keys, True)
         if hits:
+            if self.player.keys == 0:
+                self.game.sound_1.play()
+                self.game.sound_1.set_volume(2)
+            if self.player.keys == 1:
+                self.game.sound_2.play()
+                self.game.sound_2.set_volume(2)
+            if self.player.keys == 2:
+                self.game.sound_3.play()
+                self.game.sound_3.set_volume(2)
+            self.game.gems_sound.play()
             self.player.keys += 1
             #hits[0].kill()
     def player_ladder_colission(self):
@@ -128,7 +140,13 @@ class GameGround:
     def player_mushroom_colission(self):
         hits = pg.sprite.spritecollide(self.player, self.game.boosters, True)
         if hits:
+            self.game.gems_sound.play()
+            self.game.gems_sound.set_volume(0.3)
             self.player.gain_lives(20)
+    def player_coursebullet_colission(self):
+        hits = pg.sprite.spritecollide(self.player, self.game.course_bullets, True)
+        if hits:
+            self.player.hurt(self.bomb_damage)
     def player_jump_plat_colission(self):
         jump_plat_hit = pg.sprite.spritecollide(self.player, self.game.jump_platforms, False)
         if jump_plat_hit:
@@ -148,8 +166,10 @@ class GameGround:
     def handle_checkpoint_collisions(self):
         hits = pg.sprite.spritecollide(self.player, self.game.check_points, True)
         if hits:
+            self.game.check_points_sound.play()
             if hits[0].type == "1":
                 self.spawn_course_bullets = True
+                self.spawn_spikes = False
             if hits[0].type == "2":
                 self.player.gun_active = True
             elif hits[0].type == "3":
@@ -202,9 +222,10 @@ class GameGround:
         for i in range(1,3):
             for j in range(1,8):
                 WallPlatform(self.game, 500 + 69*j,WIN_HEIGHT-230+70*i, type="block")
-        Spike(self.game, 650, WIN_HEIGHT-260, 0,self.start_toggle_time)
-        Spike(self.game, 780, WIN_HEIGHT-290, 1, self.start_toggle_time)
-        Spike(self.game, 990, WIN_HEIGHT-260, 0, self.start_toggle_time)
+        Spike(self.game, 645, WIN_HEIGHT-260, 0,self.start_toggle_time)
+        Spike(self.game, 770, WIN_HEIGHT-290, 1, self.start_toggle_time)
+        Spike(self.game, 1020, WIN_HEIGHT-290, 1, self.start_toggle_time)
+        Spike(self.game, 890, WIN_HEIGHT-260, 0, self.start_toggle_time)
     def shoot_room(self):
         for i in range(1,16):
             GroundPlatform(self.game, 70*i, 515, "lava")

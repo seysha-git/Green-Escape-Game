@@ -52,25 +52,20 @@ class CourseBullet(Bullet):
         self.rect.y = 0
         self.speed = rd.randint(1,4)
     def move(self):
-        self.rect.y += 5
-    def draw(self):
-        pg.draw.rect(self.game.screen, "red", (300,300,50,50))
+        self.rect.y += 5 
     def update(self):
         self.move()
         self.check_colission()
     def check_colission(self):
         hit = pg.sprite.spritecollide(self, self.game.ground_platforms, False)
-        hit_player = pg.sprite.collide_mask(self, self.game.game_ground.player)
         hits_background = pg.sprite.spritecollide(self, self.game.background_sprites, False)
         for hit in hits_background:
             if hit.type == "umbrella_shield":
-                if self.rect.y + self.rect.height > hit.rect.y:
-                    print("hit now")
-                    self.kill()
+                self.kill()
         if hit:
             self.kill()
-        if hit_player:
-            self.kill()
-            self.game.game_ground.player.health -= 5
+        
+        
+    
 
 
