@@ -15,8 +15,6 @@ class GameGround:
         self.spawn_course_bullets = False
         self.game_door_arrived = True
         self.spawn_spikes = True
-        self.bomb_damage = 10
-        self.enemies_damage = 20
     def new(self):
         self.side_field_backgrounds()
         self.start_runner_room()
@@ -64,16 +62,15 @@ class GameGround:
         if hits:
             if self.player.keys == 0:
                 self.game.sound_1.play()
-                self.game.sound_1.set_volume(2)
+                self.game.sound_1.set_volume(5)
             if self.player.keys == 1:
                 self.game.sound_2.play()
-                self.game.sound_2.set_volume(2)
+                self.game.sound_2.set_volume(5)
             if self.player.keys == 2:
                 self.game.sound_3.play()
-                self.game.sound_3.set_volume(2)
+                self.game.sound_3.set_volume(5)
             self.game.gems_sound.play()
             self.player.keys += 1
-            #hits[0].kill()
     def player_ladder_colission(self):
         hits = pg.sprite.spritecollide(self.player, self.game.background_sprites, False)
         if not hits:
@@ -93,7 +90,7 @@ class GameGround:
                     self.player.pos.x = hits[0].rect.x - 40
                 else:
                     self.player.pos.x = hits[0].rect.x + hits[0].rect.w + 40
-                self.player.hurt(5)
+                self.player.hurt(SPIKE_DAMAGE)
     def player_door_colission(self):
         hits = pg.sprite.spritecollide(self.player, self.game.background_sprites, False)
         if hits:
@@ -122,7 +119,7 @@ class GameGround:
     def player_enemies_colission(self):
         enemies = pg.sprite.spritecollide(self.player, self.game.enemies, True)
         if enemies:
-            self.player.hurt(self.enemies_damage)          
+            self.player.hurt(ENEMIES_DAMAGE)          
     def player_jump_colissions(self):
         if self.player.vel.y > 0:
             self.player_ground_plat_collission()
@@ -142,7 +139,7 @@ class GameGround:
         if hits:
             self.game.gems_sound.play()
             self.game.gems_sound.set_volume(0.3)
-            self.player.gain_lives(20)
+            self.player.gain_lives(MUSHROOM_BOOSTER)
     def player_coursebullet_colission(self):
         hits = pg.sprite.spritecollide(self.player, self.game.course_bullets, True)
         if hits:
@@ -244,9 +241,9 @@ class GameGround:
         for i in range(1,3):
             BackgroundBlocks(self.game, 250, 70*i-20, "rope")
     def create_enemies(self):
-        while len(list(self.game.enemies)) < 1:
+        while len(list(self.game.enemies)) < MAX_ENEMIES:
             EnemyFly(self.game,  WIN_WIDTH-450,rd.randint(WIN_HEIGHT-750, WIN_HEIGHT-450))
     def update_create_bullets(self):
         if self.spawn_course_bullets:
-            while len(list(self.game.course_bullets)) < 1:
+            while len(list(self.game.course_bullets)) < MAX_COURSE_BULLETS:
                 CourseBullet(self.game)

@@ -6,6 +6,7 @@ pg.init()
 WIN_WIDTH = 1500
 WIN_HEIGHT = 900
 FPS = 60
+WAITSCREEN_FPS = 60
 
 #fonts settings
 SCROLLING_TEXT_FONT = pg.font.Font("freesansbold.ttf", 24)
@@ -42,8 +43,20 @@ BULLET_WIDTH, BULLET_HEIGHT = 20,20
 MAIN_CHAR_WIDTH, MAIN_CHAR_HEIGHT = 50,100
 
 
+#damages
+SPIKE_DAMAGE = 15
+BOMB_DAMAGE = 20
+ENEMIES_DAMAGE = 20
+MUSHROOM_BOOSTER = 20
 
 
+#difficulty
+MAX_ENEMIES = 1
+MAX_COURSE_BULLETS = 1
+
+
+#level_guide_settings
+GUIDE_SPEED = 4
 
 
 

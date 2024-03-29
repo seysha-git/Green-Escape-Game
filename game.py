@@ -48,6 +48,7 @@ class Game:
         self.enemies = pg.sprite.Group()
 
         self.game_ground.new()
+        self.game_ground.spawn_spikes = True
         pg.mixer.music.load(path.join(self.snd_dir, "part3.ogg"))
         self.run()
     def load_game_data(self):
@@ -82,6 +83,7 @@ class Game:
         self.you_lose_sound = pg.mixer.Sound(path.join(self.snd_dir, "you_lose.ogg"))
         self.you_win_sound = pg.mixer.Sound(path.join(self.snd_dir, "you_win.ogg"))
         self.shoot_sound = pg.mixer.Sound(path.join(self.snd_dir, "rlaunch.wav"))
+        self.new_high_score = pg.mixer.Sound(path.join(self.snd_dir, "new_highscore.ogg"))
         self.enemies_hit_sound = pg.mixer.Sound(path.join(self.snd_dir, "zombie-6.wav"))
         self.check_points_sound = pg.mixer.Sound(path.join(self.snd_dir, "power_up.ogg"))
         self.sound_1 = pg.mixer.Sound(path.join(self.snd_dir, "1.ogg"))
@@ -93,16 +95,16 @@ class Game:
     def level_guide(self):
         self.scrolling_text_font = pg.font.Font("freesansbold.ttf", 20)
         self.levels_messages = [ 
-            "Følg stjernene og kom deg til døren",
-            "Unngå bombene. Dukk under paraply for beskyttelse",
-            "This is CP nr 3"
+            "Følg stjernene og kom deg til døren. Kjapp deg og ikke dø !!!",
+            "Unngå bombene. Dukk under paraply for beskyttelse.",
+            "Fluene har nøkler. Skyt dem ned! Du trenger 3 nøkler"
         ]
-        self.guide_rect = pg.Rect(WIN_WIDTH//2-200, 80,600,100)
+        self.guide_rect = pg.Rect(WIN_WIDTH//2-300, 80,600,100)
         self.active_message = 0
         self.message = self.levels_messages[self.active_message]
         self.snip_guide = self.scrolling_text_font.render(self.message, True, 'white')
         self.counter = 9
-        self.speed = 4
+        self.speed = GUIDE_SPEED
         self.all_message_completed = False
         self.done = False
     def animated_message(self):
@@ -160,7 +162,7 @@ class Game:
         pg.draw.rect(self.screen, "black", (0, 220, WIN_WIDTH, 20))
         pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT-180, WIN_WIDTH, 20))
         self.draw_text("Mitt Platform spill", 100, "white",450,100)
-        self.draw_text(f'Beste tid: {self.game_data["best_time"].iloc[0]} sek', 60, "white", 600, 280 )
+        self.draw_text(f'Beste tid: {self.game_data["best_time"].iloc[0]} sek', 60, "white", 550, 280 )
         self.draw_text("Kontrollene", 50, "white", 640, 400)
         self.w = Button(self.screen, "w", 120, 70, (660,500))
         self.a = Button(self.screen, "a", 120, 70, (660,600))
@@ -198,7 +200,7 @@ class Game:
                 self.lost_game.play()
                 self.title = "Du døde"
                 pg.draw.rect(self.screen, "black", (460, 290, 620, 400), 0, 5)
-                self.draw_text(f"Godt forsøk, prøv igjen :)", 50, "white", 460, 500)
+                self.draw_text(f"Godt forsøk, prøv igjen :)", 50, "white", 500, 500)
                 self.reset_timer()
                 self.you_lose_sound.play()
             self.draw_text(f"{self.title}", 120, "white", 570, 80)
@@ -223,11 +225,11 @@ class Game:
                     "white", 460 + 100, 460)
         self.draw_text(f"Mest liv: {self.game_data['best_health'].iloc[0]}/100          Ditt liv: {health}/100", 30,
                     "white", 460 + 100, 520)
-        #self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
 
     def update_best_records(self, hit_ratio, health):
         if self.delayed_time < self.game_data["best_time"].iloc[0] or self.game_data["best_time"].iloc[0] == 0:
             self.update_game_data("best_time", [self.delayed_time])
+            self.new_high_score.play()
         if health > self.game_data["best_health"].iloc[0]:
             self.update_game_data("best_health", [health])
         if hit_ratio > self.game_data["best_aim"].iloc[0]:
@@ -237,7 +239,6 @@ class Game:
         hit_ratio = self.game_ground.player.get_hit_ratio()
         health = self.game_ground.player.health
 
-        # Display statistics
         self.draw_text("Statistikk", 50, "white", 460 + 220, 320)
         self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]}          Din tid: {self.delayed_time}", 30,
                     "white", 460 + 100, 400)
@@ -250,7 +251,7 @@ class Game:
     def wait_for_key(self):
         waiting = True
         while waiting:
-            self.clock.tick(60)
+            self.clock.tick(WAITSCREEN_FPS)
             self.play_button.check_click()
             self.quit_button.check_click()
             for event in pg.event.get():
@@ -280,28 +281,12 @@ class Game:
         navbar_rect = pg.Rect(0,0, WIN_WIDTH, 60)
         pg.draw.rect(self.screen, (77, 219, 115), navbar_rect)
         self.screen.blit(self.get_logo("main"), (30,10))
+        self.draw_text("Trykk enter for å fjerne intstruksjoner", 25, "white", 100, 18)
         self.screen.blit(self.get_logo("princess"), (WIN_WIDTH//2-10, 10))
         for i in range(self.game_ground.player.keys):
             self.screen.blit(self.get_logo("keys"), (100+ 70*i, 10))
         pg.draw.rect(self.screen, "light blue", (WIN_WIDTH-240, 10, 150, 40), 0, 5)
-        self.draw_text(f"Tid: {self.format_time(self.delayed_time)}", 30, "white", WIN_WIDTH-220, 12)
-    def format_time(self, delayed_time):
-        minutes = delayed_time // 60
-        seconds = delayed_time % 60
-        
-        if minutes < 10:
-            minutes_str = f"0{minutes}"
-        else:
-            minutes_str = str(minutes)
-        
-        if seconds < 10:
-            seconds_str = f"0{seconds}"
-        else:
-            seconds_str = str(seconds)
-        if minutes > 0:
-            return f"{seconds_str}:{minutes_str}"
-        else:
-            return f"{seconds_str}:00"
+        self.draw_text(f"Tid: {format_time(self.delayed_time)}", 30, "white", WIN_WIDTH-220, 12)
 
 
         
