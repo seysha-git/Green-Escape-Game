@@ -28,10 +28,9 @@ class Player(pg.sprite.Sprite):
         self.max_health = 100
         self.shots = 0
         self.ammo = 3
-        self.max_ammo = 3
         self.last_shot_time = 0
         self.reload_start_time = 0 
-        self.reload_time = 3000
+        self.reload_time = MAIN_RELOAD_TIME*1000
         self.hits = 0
         self.load_images()
         self.image = self.standing_frames[0]
@@ -113,7 +112,6 @@ class Player(pg.sprite.Sprite):
             self.health = self.max_health
         else:
             self.health += health_boost
-
     def animate(self):
         now = pg.time.get_ticks()
         if self.jumping:
@@ -165,13 +163,13 @@ class Player(pg.sprite.Sprite):
             self.draw_gun()
     def reload_gun(self):
         now = pg.time.get_ticks()
-        if not self.reload_state and self.ammo < self.max_ammo:
+        if not self.reload_state and self.ammo < MAIN_MAX_AMMO:
             self.reload_state = True
             self.last_shot_time = pg.time.get_ticks()
         if self.reload_state:
             now = pg.time.get_ticks()
             if now - self.last_shot_time >= self.reload_time:
-                self.ammo = self.max_ammo
+                self.ammo = MAIN_MAX_AMMO
                 self.reload_state = False
     def shoot(self, x:int,y:int):
         if self.gun_active and self.ammo > 0:
@@ -185,18 +183,21 @@ class Player(pg.sprite.Sprite):
     def draw_gun(self):
         x,y = pg.mouse.get_pos()
         angle = math.degrees(math.atan2(y - self.rect.centery, x - self.rect.centerx))
-        if self.gun_index == 1:   
-            angle = max(-30, min(30, angle))
+        if self.gun_index == 1:  
+            print("on the left side") 
+            angle += 180
             self.gun_image = self.gun_frames[self.gun_index]
-            rotated_image = pg.transform.rotate(self.gun_image, angle)
+            rotated_image = pg.transform.rotate(self.gun_image, -angle)
             gun_rect = rotated_image.get_rect()
             blit_pos = (self.rect.left - gun_rect.width + 70, self.rect.centery - gun_rect.height // 2.5)
             self.game.screen.blit(rotated_image, blit_pos)
         if self.gun_index == 0:
-            angle = max(-60, min(60, angle))
+            print("on the right side")
+            angle = max(-30, min(30, angle))
             self.gun_image = self.gun_frames[self.gun_index]
             rotated_image = pg.transform.rotate(self.gun_image, -angle) 
             self.game.screen.blit(rotated_image, (self.rect.right-50, self.rect.centery-50))
+        
     def draw_healthbar(self):
         pg.draw.rect(self.game.screen, (255, 0,0), (self.rect.x, self.rect.y - 20, self.rect.width, 10 ))
         pg.draw.rect(self.game.screen, (00, 255,0), (self.rect.x, self.rect.y - 20, self.rect.width * (1-((self.max_health - self.health))/self.max_health), 10 ))
