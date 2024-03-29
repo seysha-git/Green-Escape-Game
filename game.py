@@ -15,6 +15,7 @@ class Game:
     def __init__(self):
         pg.init()
         pg.mixer.init()
+        pg.display.set_caption('Grønn flukt')
         self.screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
         self.font_name = pg.font.match_font(FONT_NAME)
         self.clock = pg.time.Clock()
@@ -49,6 +50,7 @@ class Game:
 
         self.game_ground.new()
         self.game_ground.spawn_spikes = True
+        self.game_ground.spawn_enemies = False
         pg.mixer.music.load(path.join(self.snd_dir, "part3.ogg"))
         self.run()
     def load_game_data(self):
@@ -89,6 +91,7 @@ class Game:
         self.sound_1 = pg.mixer.Sound(path.join(self.snd_dir, "1.ogg"))
         self.sound_2 = pg.mixer.Sound(path.join(self.snd_dir, "2.ogg"))
         self.sound_3 = pg.mixer.Sound(path.join(self.snd_dir, "3.ogg"))
+        self.congratulations_sound = pg.mixer.Sound(path.join(self.snd_dir, "congratulations.ogg"))
     def update_game_data(self, column_name, new_value):
         self.game_data[column_name] = new_value
         self.game_data.to_csv("game_data.csv", index=True)
@@ -219,7 +222,7 @@ class Game:
         self.update_best_records(hit_ratio, health)
 
         self.draw_text("Statistikk", 50, "white", 460 + 220, 320)
-        self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]}          Din tid: {self.delayed_time}", 30,
+        self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]} sek         Din tid: {self.delayed_time}", 30,
                     "white", 460 + 100, 400)
         self.draw_text(f"Best aim:  {self.game_data['best_aim'].iloc[0]}%          Ditt aim : {hit_ratio}%", 30,
                     "white", 460 + 100, 460)
@@ -236,6 +239,7 @@ class Game:
             self.update_game_data("best_aim", hit_ratio)
 
     def display_game_statistics(self):
+        self.congratulations_sound.play()
         hit_ratio = self.game_ground.player.get_hit_ratio()
         health = self.game_ground.player.health
 

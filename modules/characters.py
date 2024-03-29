@@ -184,15 +184,13 @@ class Player(pg.sprite.Sprite):
         x,y = pg.mouse.get_pos()
         angle = math.degrees(math.atan2(y - self.rect.centery, x - self.rect.centerx))
         if self.gun_index == 1:  
-            print("on the left side") 
             angle += 180
             self.gun_image = self.gun_frames[self.gun_index]
             rotated_image = pg.transform.rotate(self.gun_image, -angle)
             gun_rect = rotated_image.get_rect()
-            blit_pos = (self.rect.left - gun_rect.width + 70, self.rect.centery - gun_rect.height // 2.5)
+            blit_pos = (self.rect.left - gun_rect.width + 50, self.rect.centery - gun_rect.height // 2.5)
             self.game.screen.blit(rotated_image, blit_pos)
         if self.gun_index == 0:
-            print("on the right side")
             angle = max(-30, min(30, angle))
             self.gun_image = self.gun_frames[self.gun_index]
             rotated_image = pg.transform.rotate(self.gun_image, -angle) 
@@ -218,7 +216,7 @@ class EnemyFly(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.vx = rd.randrange(4,8)
+        self.vx = rd.randrange(4,6)
         self.vy = 0
         self.dy = 0.5
 
@@ -230,7 +228,7 @@ class EnemyFly(pg.sprite.Sprite):
             self.kill()
 
         self.vy += self.dy
-        if self.vy > 5 or self.vy < -5:
+        if self.vy > 5 or self.vy < -3:
             self.dy *= -1
         center = self.rect.center
         if self.dy < 0:

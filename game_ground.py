@@ -15,12 +15,13 @@ class GameGround:
         self.spawn_course_bullets = False
         self.game_door_arrived = True
         self.spawn_spikes = True
+        self.spawn_enemies = False
     def new(self):
         self.side_field_backgrounds()
         self.start_runner_room()
         self.jump_gun_room()
         self.shoot_room()
-        self.player = Player(self.game, WIN_WIDTH-300,100)
+        self.player = Player(self.game, 300,WIN_HEIGHT-100)
     def update(self):
         self.player_wall_collision_x()
         self.player_wall_collision_y()
@@ -86,10 +87,10 @@ class GameGround:
         hits = pg.sprite.spritecollide(self.player, self.game.spikes, False)
         if hits:
             if hits[0].index == 0:
-                if self.player.pos.x < hits[0].rect.x + hits[0].rect.w:
-                    self.player.pos.x = hits[0].rect.x - 40
+                if self.player.pos.x < hits[0].rect.x + hits[0].rect.w//2:
+                    self.player.pos.x = hits[0].rect.x - 50
                 else:
-                    self.player.pos.x = hits[0].rect.x + hits[0].rect.w + 40
+                    self.player.pos.x = hits[0].rect.x + hits[0].rect.w + 50
                 self.player.hurt(SPIKE_DAMAGE)
     def player_door_colission(self):
         hits = pg.sprite.spritecollide(self.player, self.game.background_sprites, False)
@@ -143,7 +144,7 @@ class GameGround:
     def player_coursebullet_colission(self):
         hits = pg.sprite.spritecollide(self.player, self.game.course_bullets, True)
         if hits:
-            self.player.hurt(self.bomb_damage)
+            self.player.hurt(BOMB_DAMAGE)
     def player_jump_plat_colission(self):
         jump_plat_hit = pg.sprite.spritecollide(self.player, self.game.jump_platforms, False)
         if jump_plat_hit:
@@ -169,9 +170,7 @@ class GameGround:
                 self.spawn_spikes = False
             if hits[0].type == "2":
                 self.player.gun_active = True
-            elif hits[0].type == "3":
-                self.game.quiz_active = True
-                self.player.gun_active = True
+                self.spawn_enemies = True
             self.game.create_new_message()
     def move_wall_down(self):
         if self.player.keys >= 3:
@@ -219,10 +218,9 @@ class GameGround:
         for i in range(1,3):
             for j in range(1,8):
                 WallPlatform(self.game, 500 + 69*j,WIN_HEIGHT-230+70*i, type="block")
-        Spike(self.game, 645, WIN_HEIGHT-260, 0,self.start_toggle_time)
-        Spike(self.game, 770, WIN_HEIGHT-290, 1, self.start_toggle_time)
-        Spike(self.game, 1020, WIN_HEIGHT-290, 1, self.start_toggle_time)
-        Spike(self.game, 890, WIN_HEIGHT-260, 0, self.start_toggle_time)
+        Spike(self.game, 660, WIN_HEIGHT-260, 0,self.start_toggle_time)
+        Spike(self.game, 800, WIN_HEIGHT-290, 1, self.start_toggle_time)
+        Spike(self.game, 950, WIN_HEIGHT-260, 0, self.start_toggle_time)
     def shoot_room(self):
         for i in range(1,16):
             GroundPlatform(self.game, 70*i, 515, "lava")
@@ -241,8 +239,9 @@ class GameGround:
         for i in range(1,3):
             BackgroundBlocks(self.game, 250, 70*i-20, "rope")
     def create_enemies(self):
-        while len(list(self.game.enemies)) < MAX_ENEMIES:
-            EnemyFly(self.game,  WIN_WIDTH-450,rd.randint(WIN_HEIGHT-750, WIN_HEIGHT-450))
+        if self.spawn_enemies:
+            while len(list(self.game.enemies)) < MAX_ENEMIES:
+                EnemyFly(self.game,  WIN_WIDTH-450,rd.randint(WIN_HEIGHT-750, WIN_HEIGHT-550))
     def update_create_bullets(self):
         if self.spawn_course_bullets:
             while len(list(self.game.course_bullets)) < MAX_COURSE_BULLETS:
