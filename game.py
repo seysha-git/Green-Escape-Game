@@ -92,7 +92,7 @@ class Game:
         self.sound_2 = pg.mixer.Sound(path.join(self.snd_dir, "2.ogg"))
         self.sound_3 = pg.mixer.Sound(path.join(self.snd_dir, "3.ogg"))
         self.congratulations_sound = pg.mixer.Sound(path.join(self.snd_dir, "congratulations.ogg"))
-    def update_game_data(self, column_name, new_value):
+    def update_game_data(self, column_name:str, new_value:str):
         self.game_data[column_name] = new_value
         self.game_data.to_csv("game_data.csv", index=True)
     def level_guide(self):
@@ -164,9 +164,9 @@ class Game:
         self.screen.fill("light green")
         pg.draw.rect(self.screen, "black", (0, 220, WIN_WIDTH, 20))
         pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT-180, WIN_WIDTH, 20))
-        self.draw_text("Mitt Platform spill", 100, "white",450,100)
+        self.draw_text("Grønn flukt: IT 2", 100, "white",450,100)
         self.draw_text(f'Beste tid: {self.game_data["best_time"].iloc[0]} sek', 60, "white", 550, 280 )
-        self.draw_text("Kontrollene", 50, "white", 640, 400)
+        self.draw_text("Kontrollene + mus for evt å skyte", 50, "white", 450, 400)
         self.w = Button(self.screen, "w", 120, 70, (660,500))
         self.a = Button(self.screen, "a", 120, 70, (660,600))
         self.s = Button(self.screen, "s", 120, 70, (520,600))
@@ -207,29 +207,28 @@ class Game:
                 self.reset_timer()
                 self.you_lose_sound.play()
             self.draw_text(f"{self.title}", 120, "white", 570, 80)
-
-            if self.completed:
-                self.display_game_statistics()
             pg.draw.rect(self.screen, "black", (0, 220, WIN_WIDTH, 20))
             pg.draw.rect(self.screen, "black", (0, WIN_HEIGHT - 180, WIN_WIDTH, 20))
 
             pg.display.flip()
             self.wait_for_key()
     def handle_completed_game(self):
+        self.congratulations_sound.play()
         hit_ratio = self.game_ground.player.get_hit_ratio()
         health = self.game_ground.player.health
 
         self.update_best_records(hit_ratio, health)
 
         self.draw_text("Statistikk", 50, "white", 460 + 220, 320)
-        self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]} sek         Din tid: {self.delayed_time}", 30,
+        self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]} sek         Din tid: {self.delayed_time} sek", 30,
                     "white", 460 + 100, 400)
         self.draw_text(f"Best aim:  {self.game_data['best_aim'].iloc[0]}%          Ditt aim : {hit_ratio}%", 30,
                     "white", 460 + 100, 460)
         self.draw_text(f"Mest liv: {self.game_data['best_health'].iloc[0]}/100          Ditt liv: {health}/100", 30,
                     "white", 460 + 100, 520)
-
-    def update_best_records(self, hit_ratio, health):
+        self.draw_text(f"Mest liv: {self.game_data['best_health'].iloc[0]}/100          Ditt liv: {health}/100", 30,
+                    "white", 460 + 100, 520)
+    def update_best_records(self, hit_ratio:int, health:int):
         if self.delayed_time < self.game_data["best_time"].iloc[0] or self.game_data["best_time"].iloc[0] == 0:
             self.update_game_data("best_time", [self.delayed_time])
             self.new_high_score.play()
@@ -237,21 +236,6 @@ class Game:
             self.update_game_data("best_health", [health])
         if hit_ratio > self.game_data["best_aim"].iloc[0]:
             self.update_game_data("best_aim", hit_ratio)
-
-    def display_game_statistics(self):
-        self.congratulations_sound.play()
-        hit_ratio = self.game_ground.player.get_hit_ratio()
-        health = self.game_ground.player.health
-
-        self.draw_text("Statistikk", 50, "white", 460 + 220, 320)
-        self.draw_text(f"Beste tid: {self.game_data['best_time'].iloc[0]}          Din tid: {self.delayed_time}", 30,
-                    "white", 460 + 100, 400)
-        self.draw_text(f"Best aim:  {self.game_data['best_aim'].iloc[0]}%          Ditt aim : {hit_ratio}%", 30,
-                    "white", 460 + 100, 460)
-        self.draw_text(f"Mest liv: {self.game_data['best_health'].iloc[0]}/100          Ditt liv: {health}/100", 30,
-                    "white", 460 + 100, 520)
-        self.draw_text(f"Godt forsøk, prøv igjen :)", 30, "white", 460 + 150, 620)
-
     def wait_for_key(self):
         waiting = True
         while waiting:
@@ -285,7 +269,7 @@ class Game:
         navbar_rect = pg.Rect(0,0, WIN_WIDTH, 60)
         pg.draw.rect(self.screen, (77, 219, 115), navbar_rect)
         self.screen.blit(self.get_logo("main"), (30,10))
-        self.draw_text("Trykk enter for å fjerne intstruksjoner", 25, "white", 100, 18)
+        self.draw_text("Trykk enter for å fjerne intstruksjoner", 25, "white", 400, 18)
         self.screen.blit(self.get_logo("princess"), (WIN_WIDTH//2-10, 10))
         for i in range(self.game_ground.player.keys):
             self.screen.blit(self.get_logo("keys"), (100+ 70*i, 10))

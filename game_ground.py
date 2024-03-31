@@ -176,7 +176,7 @@ class GameGround:
         if self.player.keys >= 3:
             for wall in self.game.walls:
                 if wall.type == "portal":
-                    if wall.rect.y > 50:
+                    if wall.rect.y > 0:
                         wall.rect.y -= 1  
     def check_player_alive(self):
          if self.player.health < 10:
@@ -228,8 +228,8 @@ class GameGround:
         JumpPlatform(self.game, WIN_WIDTH//2+120, WIN_HEIGHT-600)
         JumpPlatform(self.game, WIN_WIDTH//2-120, WIN_HEIGHT-650)
         JumpPlatform(self.game, WIN_WIDTH//2-120, WIN_HEIGHT-450)
-        JumpPlatform(self.game, WIN_WIDTH//2-350, WIN_HEIGHT-500)
-        JumpPlatform(self.game, WIN_WIDTH//2-450, WIN_HEIGHT-600)
+        JumpPlatform(self.game, WIN_WIDTH//2-350, WIN_HEIGHT-450)
+        JumpPlatform(self.game, WIN_WIDTH//2-400, WIN_HEIGHT-550)
         BackgroundBlocks(self.game, 75, 130, "door_open_mid")
         BackgroundBlocks(self.game, 75, 130-70, "door_open_top")
         for i in range(1,8):

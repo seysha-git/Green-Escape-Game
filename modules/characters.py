@@ -191,7 +191,7 @@ class Player(pg.sprite.Sprite):
             blit_pos = (self.rect.left - gun_rect.width + 50, self.rect.centery - gun_rect.height // 2.5)
             self.game.screen.blit(rotated_image, blit_pos)
         if self.gun_index == 0:
-            angle = max(-30, min(30, angle))
+            angle = max(-70, min(70, angle))
             self.gun_image = self.gun_frames[self.gun_index]
             rotated_image = pg.transform.rotate(self.gun_image, -angle) 
             self.game.screen.blit(rotated_image, (self.rect.right-50, self.rect.centery-50))
@@ -216,7 +216,7 @@ class EnemyFly(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.vx = rd.randrange(4,6)
+        self.vx = rd.randrange(5,7)
         self.vy = 0
         self.dy = 0.5
 
