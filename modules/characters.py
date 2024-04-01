@@ -163,7 +163,7 @@ class Player(pg.sprite.Sprite):
             self.draw_gun()
     def reload_gun(self):
         now = pg.time.get_ticks()
-        if not self.reload_state and self.ammo < MAIN_MAX_AMMO:
+        if self.ammo == 0 and self.reload_state != True:
             self.reload_state = True
             self.last_shot_time = pg.time.get_ticks()
         if self.reload_state:

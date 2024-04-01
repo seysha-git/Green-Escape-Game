@@ -21,7 +21,7 @@ class GameGround:
         self.start_runner_room()
         self.jump_gun_room()
         self.shoot_room()
-        self.player = Player(self.game, 300,WIN_HEIGHT-100)
+        self.player = Player(self.game, WIN_WIDTH-250,100)
     def update(self):
         self.player_wall_collision_x()
         self.player_wall_collision_y()
