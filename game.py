@@ -12,6 +12,9 @@ import pandas as pd
 
 
 class Game:
+    """
+    Class that controls the game flow
+    """
     def __init__(self):
         pg.init()
         pg.mixer.init()
@@ -27,6 +30,7 @@ class Game:
         self.time_played = 0
         self.last_game_ended = 0
     def new(self):
+        #Sprite Groups and default settings 
         self.all_sprites = pg.sprite.LayeredUpdates()
 
         self.ground_platforms = pg.sprite.Group()
@@ -54,10 +58,12 @@ class Game:
         pg.mixer.music.load(path.join(self.snd_dir, "part3.ogg"))
         self.run()
     def load_game_data(self):
+        #Get the game data from this directory
+
         self.dir = path.dirname(__file__)
         try:
             self.game_data = pd.read_csv("game_data.csv")
-        except FileNotFoundError:
+        except FileNotFoundError: #If nobody has played, a empty dataframe will be created
             self.game_data = pd.DataFrame({
                 "best_time": [0],  
                 "best_aim": [0],
@@ -122,6 +128,7 @@ class Game:
             pg.draw.rect(self.screen, "#475F77", self.guide_rect, border_radius= 12)
             self.screen.blit(self.snip_guide, (self.guide_rect.x + 10, self.guide_rect.y + 40))
     def create_new_message(self):
+        #used in game_ground on triggering events
         if self.active_message < len(self.levels_messages) -1:
             self.active_message += 1
             self.done = False
@@ -131,7 +138,7 @@ class Game:
         else:
             return
     def run(self):
-        pg.mixer.music.play(loops=-1)
+        pg.mixer.music.play(loops=-1) #infinite playloop
         pg.mixer.music.set_volume(0.5)
         self.playing = True
         while self.playing:
@@ -155,7 +162,7 @@ class Game:
         self.screen.fill((50, 168, 82))
         self.all_sprites.draw(self.screen)
         self.navbar()
-        self.game_ground.player.draw()
+        self.game_ground.player.draw() #This draw only the player healthbar and gun. Not player
         self.draw_guide_message()
         pg.display.update()
     def show_start_screen(self):
@@ -237,6 +244,7 @@ class Game:
         if hit_ratio > self.game_data["best_aim"].iloc[0]:
             self.update_game_data("best_aim", hit_ratio)
     def wait_for_key(self):
+        #events during the wait_screens: show_start_screen and show_over_screen()
         waiting = True
         while waiting:
             self.clock.tick(WAITSCREEN_FPS)
@@ -256,7 +264,7 @@ class Game:
         text_rect = text_surface.get_rect()
         text_rect.topleft = (x,y)
         self.screen.blit(text_surface, text_rect)
-    def get_logo(self, type):
+    def get_logo(self, type:object) -> object:
         images = {
             "main": self.spritesheet_huds.get_image(55,49,47,47),
             "princess": self.spritesheet_huds.get_image(49,190,47,47),
@@ -277,4 +285,3 @@ class Game:
         self.draw_text(f"Tid: {format_time(self.delayed_time)}", 30, "white", WIN_WIDTH-220, 12)
 
 
-        

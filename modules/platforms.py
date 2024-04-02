@@ -5,6 +5,12 @@ from modules.items import PlatItem
 import random as rd
 
 class Platform(pg.sprite.Sprite):
+    """
+    Class responsible for Pbaseclass latform:
+        -added to the keys group
+        -provides base functionaly for all platforms
+    
+    """
     def __init__(self, game, x, y, type="ground", groups=None):
         super().__init__(groups or (game.all_sprites,))
         self._layer = PLATFORM_LAYER
@@ -18,6 +24,12 @@ class Platform(pg.sprite.Sprite):
 
 
 class GroundPlatform(Platform):
+    """
+    Class responsible for GroundPlatform:
+        -dictionary with all platforms on groud_level
+        -spesific colissions with this group in game_ground
+    
+    """
     def __init__(self, game, x, y, type="ground"):
         groups = game.all_sprites, game.ground_platforms
         super().__init__(game, x, y, type, groups)
@@ -31,6 +43,12 @@ class GroundPlatform(Platform):
         self.image.set_colorkey("black")
 
 class BackgroundBlocks(Platform):
+    """
+    Class responsible for BackgroundBlocks:
+        -dictionary with all platforms on background_sprites
+        -no colissions or spesific behviours: only for background stuff
+    
+    """
     def __init__(self, game, x, y, type=""):
         groups = game.all_sprites, game.background_sprites
         super().__init__(game, x, y, type, groups)
@@ -52,6 +70,10 @@ class BackgroundBlocks(Platform):
         self.image.set_colorkey("black")
 
 class WallPlatform(Platform):
+    """
+    Class responsible for Wall:
+        -spesific colissions with this group in game_ground
+    """
     def __init__(self, game, x, y, type="wall"):
         groups = game.all_sprites, game.walls
         super().__init__(game, x, y, type, groups)
@@ -59,6 +81,10 @@ class WallPlatform(Platform):
         self.image.set_colorkey("black")
 
 class RoofPlatform(Platform):
+    """
+    Class responsible for RoofPlatform:
+        -spesific colissions with this group in game_ground
+    """
     def __init__(self, game, x, y):
         groups = game.all_sprites, game.roofs
         super().__init__(game, x, y, "roof", groups)
@@ -66,6 +92,10 @@ class RoofPlatform(Platform):
         self.image.set_colorkey("black")
 
 class JumpPlatform(Platform):
+    """
+    Class responsible for JumpPlatform:
+        -spesific colissions with this group in game_ground
+    """
     def __init__(self, game, x, y):
         groups = game.all_sprites, game.jump_platforms
         super().__init__(game, x, y, "jump", groups)
@@ -75,6 +105,11 @@ class JumpPlatform(Platform):
             PlatItem(self.game, self)
 
 class MovingJumpPlatform(JumpPlatform):
+    """
+    Class responsible for Wall:
+        -spesific colissions with this group in game_ground
+        -toggled movument for each 1/2 seconds 
+    """
     def __init__(self, game, x, y, time, start_dir):
         super().__init__(game, x, y)
         self.time = time

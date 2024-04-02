@@ -8,6 +8,11 @@ from modules.weapons import CourseBullet, PlayerBullet
 
 
 class GameGround:
+    """
+    Class responsible for:
+        -creating the game field
+        -handeling player/field colission
+    """
     def __init__(self, game:object):
         self.start_toggle_time = 0
         self.game = game

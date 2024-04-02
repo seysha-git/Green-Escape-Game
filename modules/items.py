@@ -4,6 +4,11 @@ import random as rd
 from utils import *
 
 class ItemSprite(pg.sprite.Sprite):
+    """
+    Class responsible for BaseItem:
+        -items layering
+    
+    """
     def __init__(self, game, groups):
         self._layer = POW_LAYER
         self.groups = groups
@@ -11,6 +16,13 @@ class ItemSprite(pg.sprite.Sprite):
         self.game = game
 
 class PlatItem(ItemSprite):
+    """
+    Class responsible for PlatItem:
+        description: its the mushrooms on the platforms
+        -update() make sure they update with moving platforms also
+
+    
+    """
     def __init__(self, game, plat):
         groups = game.all_sprites, game.boosters
         super().__init__(game, groups)
@@ -25,6 +37,11 @@ class PlatItem(ItemSprite):
         self.rect.centerx = self.plat.rect.centerx
 
 class Checkpoint(ItemSprite):
+    """
+    Class responsible for Checkpoint:
+        -added to the check_points group
+    
+    """
     def __init__(self, game, x, y, type):
         groups = game.all_sprites, game.check_points
         super().__init__(game, groups)
@@ -36,6 +53,11 @@ class Checkpoint(ItemSprite):
         self.type = type
 
 class Key(ItemSprite):
+    """
+    Class responsible for Key:
+        -added to the keys group
+    
+    """
     def __init__(self, game, x, y):
         groups = game.all_sprites, game.keys
         super().__init__(game, groups)
@@ -46,6 +68,13 @@ class Key(ItemSprite):
         self.rect.y = y
 
 class Spike(ItemSprite):
+    """
+    Class responsible for Spike:
+        -animated mouvment
+        -seperate group: spikes
+        - 
+    
+    """
     def __init__(self, game, x, y, type, time):
         groups = game.all_sprites, game.spikes
         super().__init__(game, groups)

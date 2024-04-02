@@ -5,6 +5,10 @@ import random as rd
 from utils import *
 
 class Bullet(pg.sprite.Sprite):
+     """
+    Class responsible for Bullet:
+        -base class for all future bullets
+    """
      def __init__(self, game):
         self.game = game
         self.image = self.game.spritesheet_items.get_image(0, 553,19,20)
@@ -12,6 +16,11 @@ class Bullet(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
 
 class PlayerBullet(Bullet):
+    """
+    Class responsible for PlayerBullet:
+        -movement
+        -wall colission detection
+    """
     def __init__(self, game, x, y, speed, targetx,targety):
         super().__init__(game)
         self._layer = PLAYER_LAYER

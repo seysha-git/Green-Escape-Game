@@ -8,6 +8,14 @@ import random as rd
 vec = pg.math.Vector2
 
 class Player(pg.sprite.Sprite):
+    """
+    Class responsible for Player:
+        -Movement
+        -Animated movement
+        -Player Gun functionality
+        -drawing healthbar and gun
+        -
+    """
     def __init__(self, game:object, start_pos_x:int, start_pos_y:int):
         self._layer = PLAYER_LAYER
         self.groups = game.all_sprites
@@ -183,19 +191,17 @@ class Player(pg.sprite.Sprite):
     def draw_gun(self):
         x,y = pg.mouse.get_pos()
         angle = math.degrees(math.atan2(y - self.rect.centery, x - self.rect.centerx))
-        if self.gun_index == 1:  
+        if self.gun_index == 1:  #left side
             angle += 180
             self.gun_image = self.gun_frames[self.gun_index]
             rotated_image = pg.transform.rotate(self.gun_image, -angle)
             gun_rect = rotated_image.get_rect()
             blit_pos = (self.rect.left - gun_rect.width + 50, self.rect.centery - gun_rect.height // 2.5)
             self.game.screen.blit(rotated_image, blit_pos)
-        if self.gun_index == 0:
-            angle = max(-70, min(70, angle))
+        if self.gun_index == 0: #right side
             self.gun_image = self.gun_frames[self.gun_index]
             rotated_image = pg.transform.rotate(self.gun_image, -angle) 
-            self.game.screen.blit(rotated_image, (self.rect.right-50, self.rect.centery-50))
-        
+            self.game.screen.blit(rotated_image, (self.rect.right-50, self.rect.centery-50))  
     def draw_healthbar(self):
         pg.draw.rect(self.game.screen, (255, 0,0), (self.rect.x, self.rect.y - 20, self.rect.width, 10 ))
         pg.draw.rect(self.game.screen, (00, 255,0), (self.rect.x, self.rect.y - 20, self.rect.width * (1-((self.max_health - self.health))/self.max_health), 10 ))
@@ -203,6 +209,13 @@ class Player(pg.sprite.Sprite):
 
 
 class EnemyFly(pg.sprite.Sprite):
+    """
+    Class responsible for EnemyFly:
+        -Mouvment and animated mouvement
+        -Fly and bullet collision
+    
+    
+    """
     def __init__(self, game:object, x:int,y:int):
         self._layer = ENEMIES_LAYER
         self.groups = game.all_sprites, game.enemies

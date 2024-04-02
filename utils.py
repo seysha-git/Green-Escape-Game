@@ -1,6 +1,11 @@
 import pygame as pg
+import math
 
 class Spritesheet:
+    """
+    Class responsible for:
+        -retrieving spritesheet image from directories
+    """
  
     def __init__(self, filename):
         self.spritesheet = pg.image.load(filename).convert()
@@ -10,7 +15,11 @@ class Spritesheet:
         image.blit(self.spritesheet, (0,0), (x,y,width,height))
         return image
 
-def format_time(delayed_time):
+def format_time(delayed_time:int) -> int:
+        """
+        Function responsible for:
+            -formating timer in the navbar
+        """
         minutes = delayed_time // 60
         seconds = delayed_time % 60
         
@@ -27,3 +36,4 @@ def format_time(delayed_time):
             return f"{seconds_str}:{minutes_str}"
         else:
             return f"{seconds_str}:00"
+        
