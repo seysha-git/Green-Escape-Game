@@ -257,7 +257,7 @@ class EnemyFly(pg.sprite.Sprite):
             self.game.enemies_hit_sound.play()
             self.game.game_ground.player.hits += 1
             self.kill()
-            if rd.randrange(2) == 1:
+            if rd.randrange(4) == 1:
                 Key(self.game, self.rect.x, self.rect.y)
 
 

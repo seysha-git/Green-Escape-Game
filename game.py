@@ -104,11 +104,11 @@ class Game:
     def level_guide(self):
         self.scrolling_text_font = pg.font.Font("freesansbold.ttf", 20)
         self.levels_messages = [ 
-            "Følg stjernene og kom deg til døren. Kjapp deg og ikke dø !!!",
+            "Følg stjernene og flukt ut av døren. Trykk enter for å fjerne medlingen",
             "Unngå bombene. Dukk under paraply for beskyttelse.",
-            "Fluene har nøkler. Skyt dem ned! Du trenger 3 nøkler"
+            "Fluene har nøkler. Skyt dem ned! Du trenger 3 nøkle for å komme utr"
         ]
-        self.guide_rect = pg.Rect(WIN_WIDTH//2-300, 80,600,100)
+        self.guide_rect = pg.Rect(WIN_WIDTH//2-350, 80,700,100)
         self.active_message = 0
         self.message = self.levels_messages[self.active_message]
         self.snip_guide = self.scrolling_text_font.render(self.message, True, 'white')
@@ -277,7 +277,6 @@ class Game:
         navbar_rect = pg.Rect(0,0, WIN_WIDTH, 60)
         pg.draw.rect(self.screen, (77, 219, 115), navbar_rect)
         self.screen.blit(self.get_logo("main"), (30,10))
-        self.draw_text("Trykk enter for å fjerne intstruksjoner", 25, "white", 400, 18)
         self.screen.blit(self.get_logo("princess"), (WIN_WIDTH//2-10, 10))
         for i in range(self.game_ground.player.keys):
             self.screen.blit(self.get_logo("keys"), (100+ 70*i, 10))
