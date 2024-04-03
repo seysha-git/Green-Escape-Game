@@ -96,7 +96,7 @@ class Spike(ItemSprite):
         self.rect.x = x
         self.rect.y = y
         self.last_toggle_time = time
-        self.toggle_time = rd.randint(500,700)
+        self.toggle_time = rd.randint(800,1000)
 
     def update(self):
         if self.game.game_ground.spawn_spikes:
